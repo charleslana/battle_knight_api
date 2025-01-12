@@ -37,7 +37,7 @@ heroController.get(
 		})
 	),
 	async (c) => {
-		const id = parseInt(c.req.param('id'));
+		const { id } = c.req.valid('param');
 		console.log(`REST: get hero: ${id}`);
 		const hero = await heroService.get(c, id);
 		return c.json(hero, 200);
@@ -56,7 +56,7 @@ heroController.put(
 	),
 	zValidator('json', updateHeroSchema),
 	async (c) => {
-		const id = parseInt(c.req.param('id'));
+		const { id } = c.req.valid('param');
 		const dto: Partial<UpdateHeroDto> = c.req.valid('json');
 		console.log(`REST: update hero ${JSON.stringify(dto)} with id: ${id}`);
 		const updatedHero = await heroService.update(c, id, dto);
@@ -75,7 +75,7 @@ heroController.delete(
 		})
 	),
 	async (c) => {
-		const id = parseInt(c.req.param('id'));
+		const { id } = c.req.valid('param');
 		console.log(`REST: delete hero: ${id}`);
 		return await heroService.remove(c, id);
 	}

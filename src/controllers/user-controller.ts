@@ -43,7 +43,7 @@ userController.get(
 		})
 	),
 	async (c) => {
-		const id = parseInt(c.req.param('id'));
+		const { id } = c.req.valid('param');
 		console.log(`REST: get user: ${id}`);
 		const user = await userService.get(c, id);
 		return c.json(user, 200);
@@ -73,7 +73,7 @@ userController.delete(
 		})
 	),
 	async (c) => {
-		const id = parseInt(c.req.param('id'));
+		const { id } = c.req.valid('param');
 		console.log(`REST: delete user: ${id}`);
 		return await userService.remove(c, id);
 	}
