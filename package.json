@@ -1,0 +1,41 @@
+{
+	"name": "battle_knight_api",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"test": "vitest",
+		"cf-typegen": "wrangler types",
+		"db:generate": "drizzle-kit generate --dialect=postgresql --schema=./src/db/schema.ts",
+		"dbs:generate": "drizzle-kit generate",
+		"db:migrate": "tsx ./src/db/migrate.ts",
+		"db:migrate:local": "tsx ./src/db/migrate-local.ts",
+		"local": "NODE_ENV=local wrangler dev --ip 192.168.1.7"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.5.2",
+		"@cloudflare/workers-types": "^4.20241112.0",
+		"@types/bcryptjs": "^2.4.6",
+		"@types/validator": "^13.12.2",
+		"dotenv": "^16.4.5",
+		"drizzle-kit": "^0.28.1",
+		"pg": "^8.13.1",
+		"tsx": "^4.19.2",
+		"typescript": "^5.5.2",
+		"vitest": "2.0.5",
+		"wrangler": "^3.93.0"
+	},
+	"dependencies": {
+		"@hono/zod-validator": "^0.4.1",
+		"@neondatabase/serverless": "^0.10.4",
+		"bcryptjs": "^2.4.3",
+		"drizzle-orm": "^0.36.4",
+		"drizzle-zod": "^0.5.1",
+		"hono": "^4.6.12",
+		"validator": "^13.12.0",
+		"zlib": "^1.0.5",
+		"zod": "^3.23.8"
+	}
+}
