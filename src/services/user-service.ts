@@ -1,11 +1,12 @@
 import bcrypt from 'bcryptjs';
 import { BusinessException } from '@/shared/BusinessException';
+import { successResponse } from '@/shared/success-response';
 import { userRepository } from '@/repositories/user-repository';
 import type { User } from '@/db/model';
 import type { Context } from 'hono';
 
 export const userService = {
-	async fetchAll(c: Context) {
+	async getAll(c: Context) {
 		const users = await userRepository.getAll(c);
 		return users.map((user) => {
 			const { password, ...rest } = user;
@@ -13,7 +14,7 @@ export const userService = {
 		});
 	},
 
-	async fetch(c: Context, id: number) {
+	async get(c: Context, id: number) {
 		const user = await userRepository.get(c, id);
 		if (!user) {
 			throw new BusinessException('Usuário não encontrado', 404);
@@ -23,18 +24,19 @@ export const userService = {
 	},
 
 	async create(c: Context, email: string, password: string) {
-		const existingEmail = await findByEmail(c, email);
+		const existingEmail = await this.findByEmail(c, email);
 		if (existingEmail !== null) {
 			throw new BusinessException('Já existe um usuário com este email', 400);
 		}
 		const passwordHash = await hashPassword(password);
-		return await userRepository.create(c, email, passwordHash);
+		await userRepository.create(c, email, passwordHash);
+		return successResponse(c, 'Usuário criado com sucesso', 201);
 	},
 
-	async modify(c: Context, id: number, model: Partial<User>) {
-		const user = await this.fetch(c, id);
+	async update(c: Context, id: number, model: Partial<User>) {
+		const user = await this.get(c, id);
 		if (model.email && model.email.toLowerCase() !== user.email.toLowerCase()) {
-			const existingEmail = await findByEmail(c, model.email);
+			const existingEmail = await this.findByEmail(c, model.email);
 			if (existingEmail) {
 				throw new BusinessException('Já existe um usuário com este email', 400);
 			}
@@ -52,13 +54,17 @@ export const userService = {
 	},
 
 	async remove(c: Context, id: number) {
-		const user = await this.fetch(c, id);
-		return await userRepository.delete(c, user.id);
+		const user = await this.get(c, id);
+		if (user.role === 'admin') {
+			throw new BusinessException('Usuário administrador não pode ser removido', 403);
+		}
+		await userRepository.delete(c, user.id);
+		return successResponse(c, 'Usuário removido com sucesso', 200);
 	},
-};
 
-const findByEmail = async (c: Context, email: string) => {
-	return await userRepository.findByEmail(c, email);
+	async findByEmail(c: Context, email: string) {
+		return await userRepository.findByEmail(c, email);
+	},
 };
 
 const findByName = async (c: Context, name: string) => {

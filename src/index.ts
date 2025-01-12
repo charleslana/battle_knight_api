@@ -1,3 +1,4 @@
+import { clientAuthMiddleware } from './middleware/client-auth-middleware';
 import { customLogger } from '@/middleware/custom-logger';
 import { dbMiddleware } from '@/db/middleware';
 import { errorHandler } from './shared/error-handler';
@@ -11,6 +12,8 @@ const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 app.use(logger(customLogger));
 
 app.use(dbMiddleware);
+
+app.use(clientAuthMiddleware);
 
 app.route('/', routes);
 

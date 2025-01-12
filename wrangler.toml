@@ -23,8 +23,9 @@ enabled = true
 # Note: Use secrets to store sensitive data.
 # - https://developers.cloudflare.com/workers/configuration/secrets/
 [vars]
-CLIENT_ID = "R2VxX1VNd0JoUWx4ZUZDMHd1eFNRTzZZZVJVbUFyS2E2"
-CLIENT_SECRET = "U3BhTmRXNk1DZGpNVFlJeUFZUGhWNEZaTkhzdU9tTWsA"
+CLIENT_ID = "K3hNcVhBdzlYTU1PTU5KYXpJQXlrdnJwTjQzV2JBZVZp"
+CLIENT_SECRET = "X9pXZmMz4lV2JkYmZnQG93dJwzkLs28Rt9iDU3A6mZg"
+JWT_SECRET = "P8XcMjJRTUpJZThVdnNuRHZZVm4Dk9sHwlHJw9Wm0j0X"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#workers-ai

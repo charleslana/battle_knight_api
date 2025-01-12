@@ -7,7 +7,7 @@ export const clientAuthMiddleware: MiddlewareHandler = async (c, next) => {
 		return c.json(
 			{
 				error: true,
-				message: 'Forbidden: Invalid credentials',
+				message: 'Acesso negado. cliente inválido',
 			},
 			403
 		);

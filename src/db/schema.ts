@@ -1,6 +1,8 @@
-import { AnyPgColumn, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+import { AnyPgColumn, pgEnum, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { SQL, sql } from 'drizzle-orm';
+
+export const roleEnum = pgEnum('role', ['user', 'admin']);
 
 export function lower<T>(text: AnyPgColumn): SQL {
 	return sql<T>`lower(
@@ -13,6 +15,7 @@ export const users = pgTable('users', {
 	email: varchar('email', { length: 255 }).unique().notNull(),
 	password: text('password').notNull(),
 	name: varchar('name', { length: 20 }).unique(),
+	role: roleEnum('role').default('user').notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users, {
@@ -26,3 +29,8 @@ export const updateUserSchema = createInsertSchema(users, {
 	password: (schema) => schema.password.min(6).max(50).optional(),
 	name: (schema) => schema.name.min(3).max(20).trim().optional(),
 }).pick({ id: true, email: true, password: true, name: true });
+
+export const authUserSchema = createInsertSchema(users, {
+	email: (schema) => schema.email.email(),
+	password: (schema) => schema.password,
+}).pick({ email: true, password: true });
