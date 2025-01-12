@@ -1,6 +1,10 @@
 import type { MiddlewareHandler } from 'hono';
 
 export const clientAuthMiddleware: MiddlewareHandler = async (c, next) => {
+	const url = new URL(c.req.url);
+	if (url.pathname === '/ui' || url.pathname === '/doc') {
+		return next();
+	}
 	const clientId = c.req.header('client_id');
 	const clientSecret = c.req.header('client_secret');
 	if (clientId !== c.env.CLIENT_ID || clientSecret !== c.env.CLIENT_SECRET) {
