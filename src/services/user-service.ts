@@ -6,12 +6,16 @@ import { userRepository } from '@/repositories/user-repository';
 import type { Context } from 'hono';
 
 export const userService = {
-	async getAll(c: Context) {
-		const users = await userRepository.getAll(c);
-		return users.map((user) => {
+	async getAllPaginated(c: Context, page: number, pageSize: number) {
+		const data = await userRepository.getAllPaginated(c, page, pageSize);
+		const results = data.results.map((user) => {
 			const { password, ...rest } = user;
 			return rest;
 		});
+		return {
+			...data,
+			results,
+		};
 	},
 
 	async get(c: Context, id: number) {

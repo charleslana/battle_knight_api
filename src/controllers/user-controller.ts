@@ -3,6 +3,7 @@ import { authMiddleware } from '@/middleware/auth-middleware';
 import { CreateUserDto, UpdateUserDto } from '@/db/dto/user-dto';
 import { Hono } from 'hono';
 import { insertUserSchema, updateUserSchema } from '@/db/schemas/user-schema';
+import { paginationSchema } from '@/db/schemas/common-schema';
 import { roleAdminMiddleware } from '@/middleware/role-admin-middleware';
 import { userService } from '@/services/user-service';
 import { z } from 'zod';
@@ -27,9 +28,10 @@ userController.get('/me', authMiddleware, async (c) => {
 	return c.json(user, 200);
 });
 
-userController.get('/', authMiddleware, async (c) => {
-	console.log('REST: get all users');
-	const users = await userService.getAll(c);
+userController.get('/', authMiddleware, zValidator('query', paginationSchema), async (c) => {
+	const { page, pageSize } = c.req.valid('query');
+	console.log(`REST: get all users paginated page: ${page} page size: ${pageSize}`);
+	const users = await userService.getAllPaginated(c, page, pageSize);
 	return c.json(users, 200);
 });
 

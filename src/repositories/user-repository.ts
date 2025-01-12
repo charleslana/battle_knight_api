@@ -19,15 +19,28 @@ export const userRepository = {
 		return result;
 	},
 
-	async getAll(
+	async getAllPaginated(
 		c: Context<{
 			Bindings: Env;
 			Variables: Variables;
-		}>
+		}>,
+		page: number,
+		pageSize: number
 	) {
 		const db = c.get('db');
-		const result = await db.select().from(users);
-		return result;
+		const offset = (page - 1) * pageSize;
+		const results = await db.select().from(users).limit(pageSize).offset(offset);
+		const totalCount = await db
+			.select({ count: users.id })
+			.from(users)
+			.then((rows) => rows.length);
+		return {
+			results,
+			totalCount,
+			totalPages: Math.ceil(totalCount / pageSize),
+			currentPage: page,
+			hasNextPage: page * pageSize < totalCount,
+		};
 	},
 
 	async get(
