@@ -1,8 +1,9 @@
 import { Context } from 'hono';
 import { Env, Variables } from '@/lib/types';
 import { eq } from 'drizzle-orm';
-import { lower, users } from '@/db/schema';
-import { User } from '@/db/model';
+import { lower } from '@/db/schemas/common-schema';
+import { UpdateUserDto } from '@/db/dto/user-dto';
+import { users } from '@/db/schema';
 
 export const userRepository = {
 	async create(
@@ -47,10 +48,14 @@ export const userRepository = {
 			Variables: Variables;
 		}>,
 		id: number,
-		model: Partial<User>
+		model: Partial<UpdateUserDto>
 	) {
 		const db = c.get('db');
-		const result = await db.update(users).set(model).where(eq(users.id, id)).returning();
+		const result = await db
+			.update(users)
+			.set({ email: model.email, name: model.name, password: model.password })
+			.where(eq(users.id, id))
+			.returning();
 		return result;
 	},
 

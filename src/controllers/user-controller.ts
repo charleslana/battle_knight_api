@@ -1,51 +1,80 @@
 import { AuthDto } from '@/db/dto/auth-dto';
-import { Context } from 'hono';
-import { User } from '@/db/model';
-import { UserDto } from '@/db/dto/user-dto';
+import { authMiddleware } from '@/middleware/auth-middleware';
+import { CreateUserDto, UpdateUserDto } from '@/db/dto/user-dto';
+import { Hono } from 'hono';
+import { insertUserSchema, updateUserSchema } from '@/db/schemas/user-schema';
+import { roleAdminMiddleware } from '@/middleware/role-admin-middleware';
 import { userService } from '@/services/user-service';
+import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
 
-export const userController = {
-	async create(c: Context) {
-		const dto = await c.req.json<UserDto>();
-		console.log(`REST: create user: ${dto.email}`);
-		return await userService.create(c, dto.email, dto.password);
-	},
+export const userController = new Hono();
 
-	async getAll(c: Context) {
-		console.log('REST: get all users');
-		const users = await userService.getAll(c);
-		return c.json(users, 200);
-	},
+userController.post('/', zValidator('json', insertUserSchema), async (c) => {
+	const dto: CreateUserDto = c.req.valid('json');
+	console.log(`REST: create user: ${dto.email}`);
+	return await userService.create(c, dto.email, dto.password);
+});
 
-	async get(c: Context) {
+userController.get('/me', authMiddleware, async (c) => {
+	const payload = c.get('jwtPayload') as null | AuthDto;
+	let userId = 0;
+	if (payload) {
+		userId = payload.id;
+	}
+	console.log(`REST: get user me: ${userId}`);
+	const user = await userService.get(c, userId);
+	return c.json(user, 200);
+});
+
+userController.get('/', authMiddleware, async (c) => {
+	console.log('REST: get all users');
+	const users = await userService.getAll(c);
+	return c.json(users, 200);
+});
+
+userController.get(
+	'/:id',
+	authMiddleware,
+	zValidator(
+		'param',
+		z.object({
+			id: z.coerce.number(),
+		})
+	),
+	async (c) => {
 		const id = parseInt(c.req.param('id'));
 		console.log(`REST: get user: ${id}`);
 		const user = await userService.get(c, id);
 		return c.json(user, 200);
-	},
+	}
+);
 
-	async update(c: Context) {
-		const id = parseInt(c.req.param('id'));
-		const model = await c.req.json<User>();
-		console.log(`REST: update user ${JSON.stringify(model)} with id: ${id}`);
-		const updatedUser = await userService.update(c, id, model);
-		return c.json(updatedUser[0], 200);
-	},
+userController.put('/', authMiddleware, zValidator('json', updateUserSchema), async (c) => {
+	const payload = c.get('jwtPayload') as null | AuthDto;
+	let userId = 0;
+	if (payload) {
+		userId = payload.id;
+	}
+	const dto: Partial<UpdateUserDto> = c.req.valid('json');
+	console.log(`REST: update user ${JSON.stringify(dto)} with id: ${userId}`);
+	const updatedUser = await userService.update(c, userId, dto);
+	return c.json(updatedUser[0], 200);
+});
 
-	async remove(c: Context) {
+userController.delete(
+	'/:id',
+	authMiddleware,
+	roleAdminMiddleware,
+	zValidator(
+		'param',
+		z.object({
+			id: z.coerce.number(),
+		})
+	),
+	async (c) => {
 		const id = parseInt(c.req.param('id'));
 		console.log(`REST: delete user: ${id}`);
 		return await userService.remove(c, id);
-	},
-
-	async getMe(c: Context) {
-		const payload = c.get('jwtPayload') as null | AuthDto;
-		let userId = 0;
-		if (payload) {
-			userId = payload.id;
-		}
-		console.log(`REST: get user me: ${userId}`);
-		const user = await userService.get(c, userId);
-		return c.json(user, 200);
-	},
-};
+	}
+);

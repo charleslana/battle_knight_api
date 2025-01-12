@@ -4,7 +4,7 @@ import { dbMiddleware } from '@/db/middleware';
 import { errorHandler } from './shared/error-handler';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
-import { routes } from './routes';
+import { routes } from './routes/routes';
 import type { Env, Variables } from '@/lib/types';
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -20,7 +20,7 @@ app.route('/', routes);
 app.onError(errorHandler);
 
 app.notFound((c) => {
-	return c.json({ message: 'not found' });
+	return c.json({ error: true, message: 'Rota não encontrada' });
 });
 
 export default app;

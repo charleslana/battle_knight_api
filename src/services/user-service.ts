@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { BusinessException } from '@/shared/BusinessException';
 import { successResponse } from '@/shared/success-response';
+import { UpdateUserDto } from '@/db/dto/user-dto';
 import { userRepository } from '@/repositories/user-repository';
-import type { User } from '@/db/model';
 import type { Context } from 'hono';
 
 export const userService = {
@@ -33,7 +33,7 @@ export const userService = {
 		return successResponse(c, 'Usuário criado com sucesso', 201);
 	},
 
-	async update(c: Context, id: number, model: Partial<User>) {
+	async update(c: Context, id: number, model: Partial<UpdateUserDto>) {
 		const user = await this.get(c, id);
 		if (model.email && model.email.toLowerCase() !== user.email.toLowerCase()) {
 			const existingEmail = await this.findByEmail(c, model.email);
@@ -50,7 +50,11 @@ export const userService = {
 		if (model.password) {
 			model.password = await hashPassword(model.password);
 		}
-		return await userRepository.update(c, user.id, model);
+		const usersUpdated = await userRepository.update(c, user.id, model);
+		return usersUpdated.map((userUpdated) => {
+			const { password, role, ...rest } = userUpdated;
+			return rest;
+		});
 	},
 
 	async remove(c: Context, id: number) {

@@ -1,11 +1,13 @@
 import { authService } from '@/services/auth-service';
-import { Context } from 'hono';
+import { authUserSchema } from '@/db/schemas/user-schema';
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 
-export const authController = {
-	async login(c: Context) {
-		const { email, password } = await c.req.json();
-		console.log(`REST: Login attempt for email: ${email}`);
-		const { token } = await authService.authenticate(c, email, password);
-		return c.json({ error: false, message: 'Autenticado com sucesso', token }, 200);
-	},
-};
+export const authController = new Hono();
+
+authController.post('/', zValidator('json', authUserSchema), async (c) => {
+	const { email, password } = c.req.valid('json');
+	console.log(`REST: Login attempt for email: ${email}`);
+	const { token } = await authService.authenticate(c, email, password);
+	return c.json({ error: false, message: 'Autenticado com sucesso', token }, 200);
+});

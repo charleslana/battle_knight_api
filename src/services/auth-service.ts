@@ -6,15 +6,12 @@ import { userService } from './user-service';
 import type { Context } from 'hono';
 
 export const authService = {
-	async authenticate(
-		c: Context<{
+	async authenticate(c: Context, email: string, password: string) {
+		const context = c as Context<{
 			Bindings: Env;
 			Variables: Variables;
-		}>,
-		email: string,
-		password: string
-	) {
-		const find = await userService.findByEmail(c, email);
+		}>;
+		const find = await userService.findByEmail(context, email);
 		if (!find) {
 			throw new BusinessException('Credenciais não encontrada', 404);
 		}
@@ -25,7 +22,7 @@ export const authService = {
 		}
 		const expiresIn = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hora
 		const payload = { id: user.id, role: user.role, exp: expiresIn };
-		const token = await sign(payload, c.env.JWT_SECRET);
+		const token = await sign(payload, context.env.JWT_SECRET);
 		return { token };
 	},
 
