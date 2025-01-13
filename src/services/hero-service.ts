@@ -22,9 +22,9 @@ export const heroService = {
 		return successResponse(c, 'Herói criado com sucesso', 201);
 	},
 
-	async update(c: Context, id: number, model: Partial<UpdateHeroDto>) {
+	async update(c: Context, id: number, dto: Partial<UpdateHeroDto>) {
 		const hero = await this.get(c, id);
-		return await heroRepository.update(c, hero.id, model);
+		return await heroRepository.update(c, hero.id, dto);
 	},
 
 	async remove(c: Context, id: number) {

@@ -37,24 +37,24 @@ export const userService = {
 		return successResponse(c, 'Usuário criado com sucesso', 201);
 	},
 
-	async update(c: Context, id: number, model: Partial<UpdateUserDto>) {
+	async update(c: Context, id: number, dto: Partial<UpdateUserDto>) {
 		const user = await this.get(c, id);
-		if (model.email && model.email.toLowerCase() !== user.email.toLowerCase()) {
-			const existingEmail = await this.findByEmail(c, model.email);
+		if (dto.email && dto.email.toLowerCase() !== user.email.toLowerCase()) {
+			const existingEmail = await this.findByEmail(c, dto.email);
 			if (existingEmail) {
 				throw new BusinessException('Já existe um usuário com este email', 400);
 			}
 		}
-		if (model.name && model.name.toLowerCase() !== user.name?.toLowerCase()) {
-			const existingEmail = await findByName(c, model.name);
+		if (dto.name && dto.name.toLowerCase() !== user.name?.toLowerCase()) {
+			const existingEmail = await findByName(c, dto.name);
 			if (existingEmail) {
 				throw new BusinessException('Já existe um usuário com este nome', 400);
 			}
 		}
-		if (model.password) {
-			model.password = await hashPassword(model.password);
+		if (dto.password) {
+			dto.password = await hashPassword(dto.password);
 		}
-		const usersUpdated = await userRepository.update(c, user.id, model);
+		const usersUpdated = await userRepository.update(c, user.id, dto);
 		return usersUpdated.map((userUpdated) => {
 			const { password, role, ...rest } = userUpdated;
 			return rest;

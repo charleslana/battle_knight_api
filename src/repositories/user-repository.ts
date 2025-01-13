@@ -61,12 +61,12 @@ export const userRepository = {
 			Variables: Variables;
 		}>,
 		id: number,
-		model: Partial<UpdateUserDto>
+		dto: Partial<UpdateUserDto>
 	) {
 		const db = c.get('db');
 		const result = await db
 			.update(users)
-			.set({ email: model.email, name: model.name, password: model.password })
+			.set({ email: dto.email, name: dto.name, password: dto.password })
 			.where(eq(users.id, id))
 			.returning();
 		return result;

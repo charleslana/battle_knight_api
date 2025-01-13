@@ -3,10 +3,9 @@ import { authMiddleware } from '@/middleware/auth-middleware';
 import { CreateUserDto, UpdateUserDto } from '@/db/dto/user-dto';
 import { Hono } from 'hono';
 import { insertUserSchema, updateUserSchema } from '@/db/schemas/user-schema';
-import { paginationSchema } from '@/db/schemas/common-schema';
+import { paginationSchema, paramsSchema } from '@/db/schemas/common-schema';
 import { roleAdminMiddleware } from '@/middleware/role-admin-middleware';
 import { userService } from '@/services/user-service';
-import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 
 export const userController = new Hono();
@@ -35,22 +34,12 @@ userController.get('/', authMiddleware, zValidator('query', paginationSchema), a
 	return c.json(users, 200);
 });
 
-userController.get(
-	'/:id',
-	authMiddleware,
-	zValidator(
-		'param',
-		z.object({
-			id: z.coerce.number(),
-		})
-	),
-	async (c) => {
-		const { id } = c.req.valid('param');
-		console.log(`REST: get user: ${id}`);
-		const user = await userService.get(c, id);
-		return c.json(user, 200);
-	}
-);
+userController.get('/:id', authMiddleware, zValidator('param', paramsSchema), async (c) => {
+	const { id } = c.req.valid('param');
+	console.log(`REST: get user: ${id}`);
+	const user = await userService.get(c, id);
+	return c.json(user, 200);
+});
 
 userController.put('/', authMiddleware, zValidator('json', updateUserSchema), async (c) => {
 	const payload = c.get('jwtPayload') as null | AuthDto;
@@ -68,12 +57,7 @@ userController.delete(
 	'/:id',
 	authMiddleware,
 	roleAdminMiddleware,
-	zValidator(
-		'param',
-		z.object({
-			id: z.coerce.number(),
-		})
-	),
+	zValidator('param', paramsSchema),
 	async (c) => {
 		const { id } = c.req.valid('param');
 		console.log(`REST: delete user: ${id}`);

@@ -8,7 +8,13 @@ export function lower<T>(text: AnyPgColumn): SQL {
 	)`;
 }
 
+export const MAX_INT = 2_147_483_647;
+
+export const paramsSchema = z.object({
+	id: z.coerce.number().int().min(1).max(MAX_INT),
+});
+
 export const paginationSchema = z.object({
-	page: z.coerce.number().min(1).default(1),
-	pageSize: z.coerce.number().min(1).max(100).default(10),
+	page: z.coerce.number().int().min(1).max(MAX_INT).default(1),
+	pageSize: z.coerce.number().int().min(1).max(MAX_INT).default(10),
 });

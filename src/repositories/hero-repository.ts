@@ -10,13 +10,10 @@ export const heroRepository = {
 			Bindings: Env;
 			Variables: Variables;
 		}>,
-		model: CreateHeroDto
+		dto: CreateHeroDto
 	) {
 		const db = c.get('db');
-		const result = await db
-			.insert(heroes)
-			.values({ name: model.name, image: model.image })
-			.returning();
+		const result = await db.insert(heroes).values({ name: dto.name, image: dto.image }).returning();
 		return result;
 	},
 
@@ -49,12 +46,12 @@ export const heroRepository = {
 			Variables: Variables;
 		}>,
 		id: number,
-		model: Partial<UpdateHeroDto>
+		dto: Partial<UpdateHeroDto>
 	) {
 		const db = c.get('db');
 		const result = await db
 			.update(heroes)
-			.set({ name: model.name, image: model.image })
+			.set({ name: dto.name, image: dto.image })
 			.where(eq(heroes.id, id))
 			.returning();
 		return result;
