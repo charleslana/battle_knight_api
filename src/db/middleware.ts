@@ -1,3 +1,4 @@
+import * as schema from './schema';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { drizzle as drizzlePool } from 'drizzle-orm/node-postgres';
 import { Env, Variables } from '@/lib/types';
@@ -16,10 +17,10 @@ function createDb(
 		const pool = new Pool({
 			connectionString: c.env.DATABASE_URL_LOCAL,
 		});
-		return drizzlePool({ client: pool });
+		return drizzlePool({ client: pool, schema });
 	}
 	const sql = neon(c.env.DATABASE_URL);
-	return drizzle({ client: sql });
+	return drizzle({ client: sql, schema });
 }
 
 export type Database = ReturnType<typeof createDb>;

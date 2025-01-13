@@ -1,5 +1,6 @@
 import { heroes } from './heroes-table';
 import { integer, pgTable, serial, uniqueIndex } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { users } from './users-table';
 
 export const userHeroes = pgTable(
@@ -16,3 +17,10 @@ export const userHeroes = pgTable(
 	},
 	(table) => [uniqueIndex('user_heroes_user_id_hero_id_idx').on(table.userId, table.heroId)]
 );
+
+export const userHeroRelations = relations(userHeroes, ({ one }) => ({
+	hero: one(heroes, {
+		fields: [userHeroes.heroId],
+		references: [heroes.id],
+	}),
+}));

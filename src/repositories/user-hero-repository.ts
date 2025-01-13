@@ -28,7 +28,12 @@ export const userHeroRepository = {
 		userId: number
 	) {
 		const db = c.get('db');
-		const result = await db.select().from(userHeroes).where(eq(userHeroes.userId, userId));
+		const result = await db.query.userHeroes.findMany({
+			where: eq(userHeroes.userId, userId),
+			with: {
+				hero: true,
+			},
+		});
 		return result;
 	},
 
@@ -72,8 +77,13 @@ export const userHeroRepository = {
 		id: number
 	) {
 		const db = c.get('db');
-		const result = await db.select().from(userHeroes).where(eq(userHeroes.id, id));
-		return result[0];
+		const result = await db.query.userHeroes.findFirst({
+			where: eq(userHeroes.id, id),
+			with: {
+				hero: true,
+			},
+		});
+		return result;
 	},
 
 	async update(
