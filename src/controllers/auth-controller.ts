@@ -8,6 +8,6 @@ export const authController = new Hono();
 authController.post('/', zValidator('json', authUserSchema), async (c) => {
 	const { email, password } = c.req.valid('json');
 	console.log(`REST: Login attempt for email: ${email}`);
-	const { token } = await authService.authenticate(c, email, password);
+	const { token } = await authService.authenticate(email, password);
 	return c.json({ error: false, message: 'Autenticado com sucesso', token }, 200);
 });

@@ -2,34 +2,33 @@ import { BusinessException } from '@/shared/BusinessException';
 import { CreateHeroDto, UpdateHeroDto } from '@/db/dto/hero-dto';
 import { heroRepository } from '@/repositories/hero-repository';
 import { successResponse } from '@/shared/success-response';
-import type { Context } from 'hono';
 
 export const heroService = {
-	async getAll(c: Context) {
-		return await heroRepository.getAll(c);
+	async getAll() {
+		return await heroRepository.getAll();
 	},
 
-	async get(c: Context, id: number) {
-		const hero = await heroRepository.get(c, id);
+	async get(id: number) {
+		const hero = await heroRepository.get(id);
 		if (!hero) {
 			throw new BusinessException('Herói não encontrado', 404);
 		}
 		return hero;
 	},
 
-	async create(c: Context, dto: CreateHeroDto) {
-		await heroRepository.create(c, dto);
-		return successResponse(c, 'Herói criado com sucesso', 201);
+	async create(dto: CreateHeroDto) {
+		await heroRepository.create(dto);
+		return successResponse('Herói criado com sucesso', 201);
 	},
 
-	async update(c: Context, id: number, dto: Partial<UpdateHeroDto>) {
-		const hero = await this.get(c, id);
-		return await heroRepository.update(c, hero.id, dto);
+	async update(id: number, dto: Partial<UpdateHeroDto>) {
+		const hero = await this.get(id);
+		return await heroRepository.update(hero.id, dto);
 	},
 
-	async remove(c: Context, id: number) {
-		const hero = await this.get(c, id);
-		await heroRepository.delete(c, hero.id);
-		return successResponse(c, 'Herói removido com sucesso', 200);
+	async remove(id: number) {
+		const hero = await this.get(id);
+		await heroRepository.delete(hero.id);
+		return successResponse('Herói removido com sucesso', 200);
 	},
 };

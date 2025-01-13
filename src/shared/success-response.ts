@@ -1,7 +1,8 @@
-import { Context } from 'hono';
-import { StatusCode } from 'hono/utils/http-status';
+import { ContentfulStatusCode } from 'hono/utils/http-status';
+import { getContext } from '@/db/middleware';
 
-export const successResponse = (c: Context, message: string, status: StatusCode = 200) => {
+export const successResponse = (message: string, status: ContentfulStatusCode = 200) => {
+	const c = getContext();
 	return c.json(
 		{
 			error: false,

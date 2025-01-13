@@ -6,6 +6,14 @@ import { neon } from '@neondatabase/serverless';
 import { Pool } from 'pg';
 import type { Context, MiddlewareHandler } from 'hono';
 
+let currentContext: Context | null = null;
+
+export const contextMiddleware: MiddlewareHandler = async (c, next) => {
+	currentContext = c;
+	await next();
+	currentContext = null;
+};
+
 function createDb(
 	c: Context<{
 		Bindings: Env;
@@ -37,3 +45,22 @@ export const dbMiddleware: MiddlewareHandler = async (
 	c.set('db', db);
 	await next();
 };
+
+export function getDb(): Database {
+	const context = getContext();
+	const db = context.get('db');
+	if (!db) {
+		throw new Error('Database instance not found in context. Did you forget to use dbMiddleware?');
+	}
+	return db;
+}
+
+export function getContext(): Context<{
+	Bindings: Env;
+	Variables: Variables;
+}> {
+	if (!currentContext) {
+		throw new Error('Context is not set. Did you forget to use contextMiddleware?');
+	}
+	return currentContext;
+}

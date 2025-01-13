@@ -1,8 +1,8 @@
+import { ContentfulStatusCode } from 'hono/utils/http-status';
 import { HTTPException } from 'hono/http-exception';
-import { StatusCode } from 'hono/utils/http-status';
 
 export class BusinessException extends HTTPException {
-	constructor(message: string, statusCode: StatusCode) {
+	constructor(message: string, statusCode: ContentfulStatusCode) {
 		super(statusCode, { message: message });
 		this.name = 'BusinessException';
 	}

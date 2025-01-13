@@ -18,7 +18,7 @@ userHeroController.post(
 	async (c) => {
 		const dto: CreateUserHeroDto = c.req.valid('json');
 		console.log(`REST: create user hero: ${JSON.stringify(dto)}`);
-		const createdUserHero = await userHeroService.create(c, dto);
+		const createdUserHero = await userHeroService.create(dto);
 		return c.json(createdUserHero[0], 200);
 	}
 );
@@ -30,14 +30,14 @@ userHeroController.get('/', authMiddleware, async (c) => {
 		userId = payload.id;
 	}
 	console.log(`REST: get all user heroes with userId: ${userId}`);
-	const userHeroes = await userHeroService.getAll(c, userId);
+	const userHeroes = await userHeroService.getAll(userId);
 	return c.json(userHeroes, 200);
 });
 
 userHeroController.get('/:id', authMiddleware, zValidator('param', paramsSchema), async (c) => {
 	const { id } = c.req.valid('param');
 	console.log(`REST: get user hero: ${id}`);
-	const userHero = await userHeroService.get(c, id);
+	const userHero = await userHeroService.get(id);
 	return c.json(userHero, 200);
 });
 
@@ -53,7 +53,7 @@ userHeroController.put(
 		console.log(
 			`REST: update user hero ${JSON.stringify(dto)} with id: ${id} and userId: ${dto.userId}`
 		);
-		const updatedUserHero = await userHeroService.update(c, id, dto);
+		const updatedUserHero = await userHeroService.update(id, dto);
 		return c.json(updatedUserHero[0], 200);
 	}
 );
@@ -66,7 +66,7 @@ userHeroController.delete(
 	async (c) => {
 		const { id } = c.req.valid('param');
 		console.log(`REST: delete user hero: ${id}`);
-		const deletedUserHero = await userHeroService.remove(c, id);
+		const deletedUserHero = await userHeroService.remove(id);
 		return c.json(deletedUserHero[0], 200);
 	}
 );

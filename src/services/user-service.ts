@@ -3,11 +3,10 @@ import { BusinessException } from '@/shared/BusinessException';
 import { successResponse } from '@/shared/success-response';
 import { UpdateUserDto } from '@/db/dto/user-dto';
 import { userRepository } from '@/repositories/user-repository';
-import type { Context } from 'hono';
 
 export const userService = {
-	async getAllPaginated(c: Context, page: number, pageSize: number) {
-		const data = await userRepository.getAllPaginated(c, page, pageSize);
+	async getAllPaginated(page: number, pageSize: number) {
+		const data = await userRepository.getAllPaginated(page, pageSize);
 		const results = data.results.map((user) => {
 			const { password, ...rest } = user;
 			return rest;
@@ -18,8 +17,8 @@ export const userService = {
 		};
 	},
 
-	async get(c: Context, id: number) {
-		const user = await userRepository.get(c, id);
+	async get(id: number) {
+		const user = await userRepository.get(id);
 		if (!user) {
 			throw new BusinessException('Usuário não encontrado', 404);
 		}
@@ -27,26 +26,26 @@ export const userService = {
 		return rest;
 	},
 
-	async create(c: Context, email: string, password: string) {
-		const existingEmail = await this.findByEmail(c, email);
+	async create(email: string, password: string) {
+		const existingEmail = await this.findByEmail(email);
 		if (existingEmail !== null) {
 			throw new BusinessException('Já existe um usuário com este email', 400);
 		}
 		const passwordHash = await hashPassword(password);
-		await userRepository.create(c, email, passwordHash);
-		return successResponse(c, 'Usuário criado com sucesso', 201);
+		await userRepository.create(email, passwordHash);
+		return successResponse('Usuário criado com sucesso', 201);
 	},
 
-	async update(c: Context, id: number, dto: Partial<UpdateUserDto>) {
-		const user = await this.get(c, id);
+	async update(id: number, dto: Partial<UpdateUserDto>) {
+		const user = await this.get(id);
 		if (dto.email && dto.email.toLowerCase() !== user.email.toLowerCase()) {
-			const existingEmail = await this.findByEmail(c, dto.email);
+			const existingEmail = await this.findByEmail(dto.email);
 			if (existingEmail) {
 				throw new BusinessException('Já existe um usuário com este email', 400);
 			}
 		}
 		if (dto.name && dto.name.toLowerCase() !== user.name?.toLowerCase()) {
-			const existingEmail = await findByName(c, dto.name);
+			const existingEmail = await findByName(dto.name);
 			if (existingEmail) {
 				throw new BusinessException('Já existe um usuário com este nome', 400);
 			}
@@ -54,29 +53,29 @@ export const userService = {
 		if (dto.password) {
 			dto.password = await hashPassword(dto.password);
 		}
-		const usersUpdated = await userRepository.update(c, user.id, dto);
+		const usersUpdated = await userRepository.update(user.id, dto);
 		return usersUpdated.map((userUpdated) => {
 			const { password, role, ...rest } = userUpdated;
 			return rest;
 		});
 	},
 
-	async remove(c: Context, id: number) {
-		const user = await this.get(c, id);
+	async remove(id: number) {
+		const user = await this.get(id);
 		if (user.role === 'admin') {
 			throw new BusinessException('Usuário administrador não pode ser removido', 403);
 		}
-		await userRepository.delete(c, user.id);
-		return successResponse(c, 'Usuário removido com sucesso', 200);
+		await userRepository.delete(user.id);
+		return successResponse('Usuário removido com sucesso', 200);
 	},
 
-	async findByEmail(c: Context, email: string) {
-		return await userRepository.findByEmail(c, email);
+	async findByEmail(email: string) {
+		return await userRepository.findByEmail(email);
 	},
 };
 
-const findByName = async (c: Context, name: string) => {
-	return await userRepository.findByName(c, name);
+const findByName = async (name: string) => {
+	return await userRepository.findByName(name);
 };
 
 const hashPassword = async (password: string) => {

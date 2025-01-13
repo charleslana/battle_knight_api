@@ -1,18 +1,11 @@
 import { and, eq } from 'drizzle-orm';
-import { Context } from 'hono';
 import { CreateUserHeroDto, UpdateUserHeroDto } from '@/db/dto/user-hero-dto';
-import { Env, Variables } from '@/lib/types';
+import { getDb } from '@/db/middleware';
 import { userHeroes } from '@/db/tables/user-heroes-table';
 
 export const userHeroRepository = {
-	async create(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		dto: CreateUserHeroDto
-	) {
-		const db = c.get('db');
+	async create(dto: CreateUserHeroDto) {
+		const db = getDb();
 		const result = await db
 			.insert(userHeroes)
 			.values({ userId: dto.userId, heroId: dto.heroId })
@@ -20,14 +13,8 @@ export const userHeroRepository = {
 		return result;
 	},
 
-	async getAllByUserId(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		userId: number
-	) {
-		const db = c.get('db');
+	async getAllByUserId(userId: number) {
+		const db = getDb();
 		const result = await db.query.userHeroes.findMany({
 			where: eq(userHeroes.userId, userId),
 			with: {
@@ -37,15 +24,8 @@ export const userHeroRepository = {
 		return result;
 	},
 
-	async getByIdAndUserId(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		id: number,
-		userId: number
-	) {
-		const db = c.get('db');
+	async getByIdAndUserId(id: number, userId: number) {
+		const db = getDb();
 		const result = await db
 			.select()
 			.from(userHeroes)
@@ -53,15 +33,8 @@ export const userHeroRepository = {
 		return result[0];
 	},
 
-	async getByHeroIdAndUserId(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		heroId: number,
-		userId: number
-	) {
-		const db = c.get('db');
+	async getByHeroIdAndUserId(heroId: number, userId: number) {
+		const db = getDb();
 		const result = await db
 			.select()
 			.from(userHeroes)
@@ -69,14 +42,8 @@ export const userHeroRepository = {
 		return result[0];
 	},
 
-	async get(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		id: number
-	) {
-		const db = c.get('db');
+	async get(id: number) {
+		const db = getDb();
 		const result = await db.query.userHeroes.findFirst({
 			where: eq(userHeroes.id, id),
 			with: {
@@ -86,15 +53,8 @@ export const userHeroRepository = {
 		return result;
 	},
 
-	async update(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		id: number,
-		dto: UpdateUserHeroDto
-	) {
-		const db = c.get('db');
+	async update(id: number, dto: UpdateUserHeroDto) {
+		const db = getDb();
 		const result = await db
 			.update(userHeroes)
 			.set({ upgrade: dto.upgrade })
@@ -103,14 +63,8 @@ export const userHeroRepository = {
 		return result;
 	},
 
-	async delete(
-		c: Context<{
-			Bindings: Env;
-			Variables: Variables;
-		}>,
-		id: number
-	) {
-		const db = c.get('db');
+	async delete(id: number) {
+		const db = getDb();
 		const result = await db.delete(userHeroes).where(eq(userHeroes.id, id)).returning();
 		return result;
 	},
