@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import { restrictMiddleware } from '@/middleware/restrict-middleware';
 import { swaggerUI } from '@hono/swagger-ui';
 
 export const swaggerRoute = new OpenAPIHono();
@@ -72,13 +73,13 @@ swaggerRoute.openapi(
 	}
 );
 
-swaggerRoute.doc('/doc', {
+swaggerRoute.doc('/ui/doc', {
 	openapi: '3.0.0',
 	info: {
 		version: '1.0.0',
 		title: 'My API',
-		description: 'Test',
+		description: 'Restricted',
 	},
 });
 
-swaggerRoute.get('/ui', swaggerUI({ url: '/doc' }));
+swaggerRoute.get('/ui', restrictMiddleware, swaggerUI({ url: '/ui/doc' }));

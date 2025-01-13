@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from 'hono';
 
 export const clientAuthMiddleware: MiddlewareHandler = async (c, next) => {
 	const url = new URL(c.req.url);
-	if (url.pathname === '/ui' || url.pathname === '/doc') {
+	if (url.pathname === '/ui' || url.pathname === '/ui/doc') {
 		return next();
 	}
 	const clientId = c.req.header('client_id');

@@ -7,6 +7,7 @@ export type Env = {
 	CLIENT_ID: string;
 	CLIENT_SECRET: string;
 	JWT_SECRET: string;
+	VALID_KEY: string;
 };
 
 export type Variables = {
