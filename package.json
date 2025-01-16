@@ -7,6 +7,7 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "vitest",
+		"coverage": "vitest --coverage",
 		"cf-typegen": "wrangler types",
 		"db:generate": "drizzle-kit generate --dialect=postgresql --schema=./src/db/schema.ts",
 		"dbs:generate": "drizzle-kit generate",
@@ -21,13 +22,14 @@
 		"@hono/zod-openapi": "^0.18.3",
 		"@types/bcryptjs": "^2.4.6",
 		"@types/validator": "^13.12.2",
+		"@vitest/coverage-istanbul": "^2.1.8",
 		"dotenv": "^16.4.5",
 		"drizzle-kit": "^0.28.1",
 		"pg": "^8.13.1",
 		"tsx": "^4.19.2",
 		"typescript": "^5.5.2",
 		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "2.0.5",
+		"vitest": "2.1.8",
 		"wrangler": "^3.93.0"
 	},
 	"dependencies": {

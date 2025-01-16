@@ -22,7 +22,7 @@ app.route('/', routes);
 app.onError(errorHandler);
 
 app.notFound((c) => {
-	return c.json({ error: true, message: 'Rota não encontrada' });
+	return c.json({ error: true, message: 'Rota não encontrada' }, 404);
 });
 
 export default app;
