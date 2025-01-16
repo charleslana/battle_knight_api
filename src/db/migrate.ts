@@ -1,6 +1,5 @@
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { log } from '@/shared/log-pino';
 import { migrate } from 'drizzle-orm/neon-http/migrator';
 import { neon } from '@neondatabase/serverless';
 
@@ -8,7 +7,7 @@ config({
 	path: '.dev.vars',
 });
 
-log.info(process.env.DATABASE_URL);
+console.log(process.env.DATABASE_URL);
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -19,7 +18,7 @@ const main = async () => {
 		await migrate(db, {
 			migrationsFolder: 'drizzle',
 		});
-		log.info('Migrated successful.');
+		console.log('Migrated successful.');
 	} catch (error) {
 		console.error(error);
 		process.exit(1);
