@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { log } from '@/shared/log-pino';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 
@@ -18,7 +19,7 @@ const main = async () => {
 		await migrate(db, {
 			migrationsFolder: 'drizzle',
 		});
-		console.log('Migration completed on local PostgreSQL');
+		log.info('Migration completed on local PostgreSQL');
 	} catch (error) {
 		console.error('Migration failed:', error);
 		process.exit(1);

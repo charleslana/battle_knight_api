@@ -19,7 +19,7 @@ export const authService = {
 		const payload = { id: user.id, role: user.role, exp: expiresIn };
 		const context = getContext();
 		const token = await sign(payload, context.env.JWT_SECRET);
-		return { token };
+		return { token, userId: user.id };
 	},
 
 	async verifyToken(token: string, secret: string) {

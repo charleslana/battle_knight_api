@@ -5,11 +5,13 @@ import { itemController } from '@/controllers/item-controller';
 import { swaggerRoute } from '@/config/swagger';
 import { userController } from '@/controllers/user-controller';
 import { userHeroController } from '@/controllers/user-hero-controller';
+import { userItemController } from '@/controllers/user-item-controller';
 
 const routes = new Hono();
 
 routes.route('/api/v1/user/auth', authController);
 routes.route('/api/v1/user/hero', userHeroController);
+routes.route('/api/v1/user/item', userItemController);
 routes.route('/api/v1/user', userController);
 routes.route('/api/v1/hero', heroController);
 routes.route('/api/v1/item', itemController);

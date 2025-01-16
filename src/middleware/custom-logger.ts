@@ -1,3 +1,5 @@
+import { log } from '@/shared/log-pino';
+
 export const customLogger = (message: string, ...rest: string[]) => {
-	console.log(message, ...rest)
-}
+	log.info(message, ...rest);
+};
